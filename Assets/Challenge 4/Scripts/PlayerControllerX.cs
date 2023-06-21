@@ -51,27 +51,24 @@ public class PlayerControllerX : MonoBehaviour
         powerupIndicator.SetActive(false);
     }
 
-    // If Player collides with enemy
-    private void OnCollisionEnter(Collision other)
+   // If Player collides with enemy
+private void OnCollisionEnter(Collision other)
+{
+    if (other.gameObject.CompareTag("Enemy"))
     {
-        if (other.gameObject.CompareTag("Enemy"))
+        Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
+        Vector3 awayFromPlayer = other.gameObject.transform.position - transform.position;
+        
+        if (hasPowerup) // if have powerup hit enemy with powerup force
         {
-            Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
-            Vector3 awayFromPlayer =  transform.position - other.gameObject.transform.position; 
-           
-            if (hasPowerup) // if have powerup hit enemy with powerup force
-            {
-                enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
-            }
-            else // if no powerup, hit enemy with normal strength 
-            {
-                enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
-            }
-
-
+            enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
+        }
+        else // if no powerup, hit enemy with normal strength 
+        {
+            enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
         }
     }
-
+}
 
 
 }
