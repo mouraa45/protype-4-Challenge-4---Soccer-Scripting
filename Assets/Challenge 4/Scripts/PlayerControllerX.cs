@@ -19,6 +19,11 @@ public class PlayerControllerX : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         focalPoint = GameObject.Find("Focal Point");
+
+        if (focalPoint == null)
+        {
+            Debug.LogError("Focal Point não encontrado. Verifique se você tem um objeto de jogo chamado 'Focal Point' na sua cena.");
+        }
     }
 
     void Update()
@@ -30,6 +35,11 @@ public class PlayerControllerX : MonoBehaviour
         // Set powerup indicator position to beneath player
         powerupIndicator.transform.position = transform.position + new Vector3(0, -0.6f, 0);
 
+        // Check for speed boost input
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            SpeedBoost();
+        }
     }
 
     // If Player collides with powerup, activate powerup
@@ -40,6 +50,7 @@ public class PlayerControllerX : MonoBehaviour
             Destroy(other.gameObject);
             hasPowerup = true;
             powerupIndicator.SetActive(true);
+            StartCoroutine(PowerupCooldown()); // Start the powerup cooldown coroutine
         }
     }
 
@@ -51,24 +62,32 @@ public class PlayerControllerX : MonoBehaviour
         powerupIndicator.SetActive(false);
     }
 
-   // If Player collides with enemy
-private void OnCollisionEnter(Collision other)
-{
-    if (other.gameObject.CompareTag("Enemy"))
+    // If Player collides with enemy
+    private void OnCollisionEnter(Collision other)
     {
-        Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
-        Vector3 awayFromPlayer = other.gameObject.transform.position - transform.position;
-        
-        if (hasPowerup) // if have powerup hit enemy with powerup force
+        if (other.gameObject.CompareTag("Enemy"))
         {
-            enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
-        }
-        else // if no powerup, hit enemy with normal strength 
-        {
-            enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
+            Rigidbody enemyRigidbody = other.gameObject.GetComponent<Rigidbody>();
+            Vector3 awayFromPlayer = other.gameObject.transform.position - transform.position;
+            
+            if (hasPowerup) // if have powerup hit enemy with powerup force
+            {
+                enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
+            }
+            else // if no powerup, hit enemy with normal strength 
+            {
+                enemyRigidbody.AddForce(awayFromPlayer * normalStrength, ForceMode.Impulse);
+            }
         }
     }
-}
 
+    // Apply a speed boost to the player
+    private void SpeedBoost()
+    {
+        playerRb.AddForce(focalPoint.transform.forward * speed * 2f, ForceMode.Impulse);
 
+        // Instantiate particle effect
+        GameObject particleEffect = Instantiate(Resources.Load<GameObject>("SpeedBoostEffect"), focalPoint.transform);
+        Destroy(particleEffect, 2f);
+    }
 }

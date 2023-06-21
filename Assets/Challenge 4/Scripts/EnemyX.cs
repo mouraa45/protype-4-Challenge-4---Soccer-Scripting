@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class EnemyX : MonoBehaviour
 {
-    public float speed;
+    private float speed;
+
     private Rigidbody enemyRb;
     private GameObject playerGoal;
 
@@ -13,6 +14,11 @@ public class EnemyX : MonoBehaviour
     {
         enemyRb = GetComponent<Rigidbody>();
         playerGoal = GameObject.Find("Player Goal");
+
+        if (playerGoal == null)
+        {
+            Debug.LogError("Player Goal não atribuído ao EnemyX. Verifique se você tem um objeto de jogo chamado 'Player Goal' na sua cena.");
+        }
     }
 
     // Update is called once per frame
@@ -40,5 +46,11 @@ public class EnemyX : MonoBehaviour
 
             enemyRigidbody.AddForce(awayFromPlayer * speed, ForceMode.Impulse);
         }
+    }
+
+    // Set the speed of the enemy
+    public void SetSpeed(float newSpeed)
+    {
+        speed = newSpeed;
     }
 }
